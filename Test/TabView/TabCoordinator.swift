@@ -18,7 +18,7 @@ protocol TabCoordProtocol: CanChangeViewProtocol, CanChangeTabProtocol {
     var profileViewModel: ProfileVMProt { get }
     var searchViewModel: SearchVMProt { get }
     var detailedViewModel: DetailedVMProt { get }
-    var networkManager: NetworkManagerProtocol { get }
+    var networkService: NetworkServiceProtocol { get }
     var pictureCancellable: AnyCancellable? { get }
 }
 
@@ -33,7 +33,7 @@ final class TabCoordinator: TabCoordProtocol {
     var profileViewModel: ProfileViewModel
     var searchViewModel: SearchViewModel
     var detailedViewModel: DetailedViewModel
-    var networkManager: NetworkManagerProtocol
+    var networkService: NetworkServiceProtocol
     
     var pictureCancellable: AnyCancellable?
     
@@ -45,10 +45,10 @@ final class TabCoordinator: TabCoordProtocol {
                                       detailedViewModel: detailedViewModel)
         profileViewModel = ProfileViewModel()
         
-        networkManager = NetworkManager()
-        homeViewModel.networkManager = networkManager
-        searchViewModel.networkManager = networkManager
-        detailedViewModel.networkManager = networkManager
+        networkService = NetworkService()
+        homeViewModel.networkService = networkService
+        searchViewModel.networkService = networkService
+        detailedViewModel.networkService = networkService
         
         //MARK: - Observers
         profileViewModel.currentTabPublisher
@@ -61,9 +61,9 @@ final class TabCoordinator: TabCoordProtocol {
         profileViewModel.currentViewPublisher
             .assign(to: &$currentView)
         
-        pictureCancellable = profileViewModel.photoDataPublisher
-            .sink { [weak self] data in
-                self?.homeViewModel.userImageData = data
+        pictureCancellable = profileViewModel.userPublisher
+            .sink{ [weak self] user in
+                self?.homeViewModel.userImageData = user.image
             }
     }
 }

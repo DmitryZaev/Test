@@ -17,6 +17,7 @@ protocol SignInViewModelProtocol: CanChangeViewProtocol {
     var badEmailText: String { get }
     var duplicateUserText: String { get }
     var keychainManager: KeychainManagerProtocol? { get }
+    var signInDidPressed: Bool? { get set }
     var logInDidPressed: Bool? { get set }
     
     func signIn()
@@ -43,6 +44,12 @@ final class SignInViewModel: SignInViewModelProtocol {
         }
     }
     
+    var signInDidPressed: Bool? {
+        didSet {
+            self.signIn()
+        }
+    }
+    
     func signIn() {
         guard !firstNameText.isEmpty,
               !lastNameText.isEmpty,
@@ -52,6 +59,7 @@ final class SignInViewModel: SignInViewModelProtocol {
                 try keychainManager?.save(firstName: firstNameText,
                                           lastName: lastNameText,
                                           email: emailText)
+                
                 currentView = .tabView
             } catch let error {
                 switch error {

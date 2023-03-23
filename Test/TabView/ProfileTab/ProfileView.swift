@@ -17,34 +17,16 @@ struct ProfileView<ViewModel : ProfileViewModelProtocol>: View {
             Spacer().frame(height: 63)
 
 //MARK: - Header
-            HStack {
-                Button {
-                    viewModel.backButtonPressed.toggle()
-                } label: {
-                    Image("backPic")
-                        .resizable()
-                        .frame(width: 16)
-                }
-                Spacer()
-                Text("Profile")
-                    .font(.custom("Montserrat", size: 15))
-                    .fontWeight(.bold)
-                Spacer()
-                Spacer().frame(width: 16)
-
-            }
-            .frame(height: 16)
-            .foregroundColor(.black)
-            .padding(.horizontal, 20)
+            ProfileHeaderView(backButtonDidPressed: $viewModel.backButtonPressed)
             
             Spacer().frame(height: 18)
 
 //MARK: - Photo
-            ProfilePhotoView(imageData: $viewModel.photoData)
+            ProfilePhotoView(imageData: $viewModel.user.image)
             
             Spacer().frame(height: 18)
 //MARK: - Name
-            Text(viewModel.nameText)
+            Text(viewModel.user.name)
                 .font(.custom("Montserrat", size: 15))
                 .fontWeight(.bold)
                 .foregroundColor(Color(red: 0.247, green: 0.247, blue: 0.247))
@@ -52,35 +34,11 @@ struct ProfileView<ViewModel : ProfileViewModelProtocol>: View {
             Spacer().frame(height: 33)
             
 //MARK: - Upload Button
-            Button {
-                print("Upload")
-            } label: {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 14.5)
-                        .foregroundColor(Color(red: 0.306, green: 0.333, blue: 0.843))
-                    
-                    HStack {
-                        Spacer()
-                        Image("uploadPic")
-                            .resizable()
-                            .frame(width: 12, height: 15)
-                        Spacer()
-                        Text("Upload item")
-                            .font(.custom("Montserrat", size: 14))
-                            .fontWeight(.semibold)
-                        Spacer()
-                        Spacer().frame(width: 12)
-                        Spacer()
-                    }
-                    .foregroundColor(Color(red: 0.919, green: 0.919, blue: 0.919))
-                }
-                .frame(height: 40)
-                .padding(.horizontal, 43)
-            }
+            UploadButton()
             
 //MARK: - List with buttons
             ProfileListView(logoutPressed: $viewModel.logoutPressed,
-                            balance: viewModel.balance)
+                            balance: viewModel.user.balance)
             .padding(.leading, 32)
             .padding(.trailing, 46)
             .padding(.top, 8)

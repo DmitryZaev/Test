@@ -15,11 +15,7 @@ enum BlockItem: String {
 
 struct BlockView: View {
     let block: BlockItem
-    let items: [(name: String?,
-                 category: String?,
-                 price: String?,
-                 discount: Int?,
-                 imageUrlString: String?)]
+    let items: [Product]
     
     let itemSize: CGSize
     let spacing: CGFloat
@@ -31,11 +27,7 @@ struct BlockView: View {
     let detailedVM: any DetailedViewModelProtocol
     
     init(block: BlockItem,
-         items: [(name: String?,
-                  category: String?,
-                  price: String?,
-                  discount: Int?,
-                  imageUrlString: String?)],
+         items: [Product],
          detailedVM: any DetailedViewModelProtocol) {
         self.block = block
         self.items = items
@@ -74,7 +66,7 @@ struct BlockView: View {
                                              itemWidth: itemSize.width)
 //MARK: - Price, Fafotites & toCart Buttons
                            BlockItemFooterView(blockType: block,
-                                               price: item.price)
+                                               price: block == .flashSale ? item.flashSalePrice : item.latestPrice )
                        }
                        .padding(.top, padding.top)
                        .padding(.bottom, padding.bottom)
@@ -89,10 +81,10 @@ struct BlockView: View {
                            NavigationLink {
                                DetailedView(viewModel: detailedVM as! DetailedViewModel)
                            } label: {
-                               ImageFrom(imageUrlString: item.imageUrlString ?? "")
+                               ImageFrom(imageUrlString: item.imageUrl ?? "")
                            }
                        } else {
-                           ImageFrom(imageUrlString: item.imageUrlString ?? "")
+                           ImageFrom(imageUrlString: item.imageUrl ?? "")
                        }
                    }
                    .cornerRadius(10)
@@ -107,11 +99,11 @@ struct BlockView: View {
 struct BlockView_Previews: PreviewProvider {
     static var previews: some View {
         BlockView(block: .flashSale,
-                  items: [(name: "Aaaaaaaa",
-                           category: "Bbbbbb",
-                           price: "54,00",
-                           discount: 30,
-                           imageUrlString: "")],
+                  items: [Product(category: "kids",
+                                  name: "Nike",
+                                  price: 55.0,
+                                  discount: 30,
+                                  imageUrl: "dfdfd")],
         detailedVM: DetailedViewModel())
     }
 }

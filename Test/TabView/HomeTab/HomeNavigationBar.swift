@@ -14,14 +14,18 @@ struct HomeNavigationBar: View {
     var body: some View {
         HStack {
 //MARK: - Menu button
-            Button {
-                print("Menu")
-            } label: {
-                Image("menuPic")
-                    .resizable()
-                    .frame(width: 22, height: 24)
-                    .foregroundColor(.black)
+            HStack {
+                Button {
+                    print("Menu")
+                } label: {
+                    Image("menuPic")
+                        .resizable()
+                        .frame(width: 22, height: 24)
+                        .foregroundColor(.black)
+                }
+                Spacer()
             }
+            .frame(width: 70)
             
             Spacer()
 //MARK: - Title
@@ -74,7 +78,9 @@ struct HomeNavigationBar: View {
                             .foregroundColor(.black)
                     }
                 }
-            }.offset(x: -22, y:10)
+            }
+            .frame(width: 70)
+            .offset(y:10)
         }
         .padding(.horizontal, 15)
         .padding(.top, -5)

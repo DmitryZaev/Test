@@ -20,44 +20,52 @@ struct DetailedQuantityView: View {
                 .foregroundColor(Color(red: 0.094, green: 0.09, blue: 0.149))
             
             HStack(alignment: .bottom) {
-                VStack {
-                    Text("Quantity:")
+                VStack(alignment: .leading) {
+                    Text("Quantity: \(quantity)")
                         .font(.custom("Poppins", size: 9))
                         .foregroundColor(Color(red: 0.502, green: 0.502, blue: 0.502))
+                    
+                    Spacer().frame(height: 14)
+
 //MARK: - +/- buttons
-                    Button {
-                        if quantity > 1 {
-                            quantity -= 1
-                        }
-                    } label: {
-                        RoundedRectangle(cornerRadius: 8)
-                            .frame(width: 38, height: 22)
-                            .foregroundColor(Color(red: 0.306, green: 0.333, blue: 0.843))
-                            .overlay {
-                                Image("minusPic")
-                                    .resizable()
-                                    .frame(width: 8, height: 2)
-                                    .foregroundColor(.white)
+                    HStack {
+                        Button {
+                            if quantity > 1 {
+                                quantity -= 1
                             }
-                    }
-                }.offset(y: -3)
-                
-                Spacer().frame(width: 21)
-                
-                Button {
-                    quantity += 1
-                } label: {
-                    RoundedRectangle(cornerRadius: 8)
-                        .frame(width: 38, height: 22)
-                        .foregroundColor(Color(red: 0.306, green: 0.333, blue: 0.843))
-                        .overlay {
-                            Image("plus1Pic")
-                                .resizable()
-                                .frame(width: 8, height: 8)
-                                .foregroundColor(.white)
+                        } label: {
+                            RoundedRectangle(cornerRadius: 8)
+                                .frame(width: 38, height: 22)
+                                .foregroundColor(Color(red: 0.306, green: 0.333, blue: 0.843))
+                                .overlay {
+                                    Image("minusPic")
+                                        .resizable()
+                                        .frame(width: 8, height: 2)
+                                        .foregroundColor(.white)
+                                }
+                            
                         }
+                        
+                        Spacer().frame(width: 21)
+                        
+                        Button {
+                            quantity += 1
+                        } label: {
+                            RoundedRectangle(cornerRadius: 8)
+                                .frame(width: 38, height: 22)
+                                .foregroundColor(Color(red: 0.306, green: 0.333, blue: 0.843))
+                                .overlay {
+                                    Image("plus1Pic")
+                                        .resizable()
+                                        .frame(width: 8, height: 8)
+                                        .foregroundColor(.white)
+                                }
+                        }
+                    }
+                    
+                    .offset(y: -3)
                 }
-                .offset(y: -3)
+                .frame(height: 44)
                 
                 Spacer()
 

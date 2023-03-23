@@ -24,7 +24,7 @@ final class SearchViewModel: SearchViewModelProtocol {
     
     let fontSize: CGFloat = 10
     
-    var networkManager: NetworkManagerProtocol?
+    var networkService: NetworkServiceProtocol?
     
     var cancellable: Set<AnyCancellable> = []
     
@@ -33,10 +33,8 @@ final class SearchViewModel: SearchViewModelProtocol {
     }
     
     func getData() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.networkManager?.fetchProducts(.search)
-                .map{ $0 as Words}
-                .receive(on: RunLoop.main)
+        networkService?.getWords()
+                .delay(for: 1, scheduler: RunLoop.main)
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished:
@@ -56,7 +54,6 @@ final class SearchViewModel: SearchViewModelProtocol {
                     }
                 })
                 .store(in: &self.cancellable)
-        }
     }
     
     func select(text: String) {

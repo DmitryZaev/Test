@@ -41,22 +41,8 @@ struct SignInView<ViewModel: SignInViewModelProtocol>: View {
                                 placeholder: "Email")
 
 //MARK: - SignIn Button
-                Button {
-                    firstNameIsActive = false
-                    lastNameIsActive = false
-                    emailIsActive = false
-                    viewModel.signIn()
-                } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 14.5)
-                            .foregroundColor(Color(red: 0.306, green: 0.333, blue: 0.843))
-                        
-                        Text("Sign in")
-                            .foregroundColor(Color(red: 0.919, green: 0.919, blue: 0.919))
-                            .font(.custom("Montserrat", size: 14))
-                            .bold()
-                    }
-                    .frame(height: 46)
+                SingInButton(didPressed: $viewModel.signInDidPressed) {
+                    self.hideKeyboard()
                 }
             }
             .padding(.horizontal, 43)
@@ -64,54 +50,22 @@ struct SignInView<ViewModel: SignInViewModelProtocol>: View {
             Spacer().frame(height: 17.5)
             
 //MARK: - Login text & button
-            HStack {
-                Text("Already have an account?")
-                    .foregroundColor(Color(red: 0.502, green: 0.502, blue: 0.502))
-                
-                Button("Log in") {
-                    viewModel.logInDidPressed?.toggle()
-                }
-                .tint(Color(red: 0.145, green: 0.31, blue: 0.902))
-                
-                Spacer()
+            LoginBlock(didPressed: $viewModel.logInDidPressed) {
+                self.hideKeyboard()
             }
-            .padding(.horizontal, 42)
-            .font(.custom("Montserrat", size: 10))
             
             Spacer().frame(height: 74)
             
 //MARK: - Google / Apple buttons
-            VStack(alignment: .leading, spacing: 38) {
-                Button {
-                    print("Sign in with Google")
-                } label: {
-                    HStack {
-                        Image("googlePic")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                        
-                        Text(" Sign in with Google")
-                    }
-                }
-                
-                Button {
-                    print("Sign in with Apple")
-                } label: {
-                    HStack {
-                        Image("applePic")
-                            .resizable()
-                            .frame(width: 18, height: 22)
-                        
-                        Text(" Sign in with Apple")
-                    }
-                }
-            }
-            .tint(.black)
-            .font(.custom("Montserrat", size: 13))
+            GoogleAppleButtons()
             
             Spacer()
         }
         .ignoresSafeArea()
+        .background {
+            Color.white.opacity(0.001)
+                .gesture(tapGesture)
+        }
         .onDisappear {
             viewModel.firstNameText = ""
             viewModel.lastNameText = ""
@@ -130,6 +84,19 @@ struct SignInView<ViewModel: SignInViewModelProtocol>: View {
         } message: {
             Text(viewModel.duplicateUserText)
         }
+    }
+    
+    var tapGesture: some Gesture {
+        TapGesture()
+            .onEnded {
+                hideKeyboard()
+            }
+    }
+    
+    private func hideKeyboard() {
+        firstNameIsActive = false
+        lastNameIsActive = false
+        emailIsActive = false
     }
 }
 

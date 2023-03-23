@@ -16,6 +16,7 @@ protocol AppCoordProtocol: CanChangeViewProtocol {
     var logInViewModel: LogInVMProt { get }
     var tabCoordinator: TabCoordProt { get }
     var keychainManager: KeychainManagerProtocol { get }
+    var anyCancellable: Set<AnyCancellable> { get set }
 }
 
 //MARK: - Implementation
@@ -26,6 +27,8 @@ final class AppCoordinator: AppCoordProtocol {
     var logInViewModel: LogInViewModel
     var tabCoordinator: TabCoordinator
     var keychainManager: KeychainManagerProtocol
+    
+    var anyCancellable = Set<AnyCancellable>()
     
     init() {
         signInViewModel = SignInViewModel()
@@ -38,11 +41,29 @@ final class AppCoordinator: AppCoordProtocol {
         
         //MARK: - Observers
         signInViewModel.currentViewPublisher
-            .assign(to: &$currentView)
+            .sink { [weak self] view in
+                if view == .tabView {
+                    self?.tabCoordinator.profileViewModel.configureUser()
+                }
+                self?.currentView = view
+            }
+            .store(in: &anyCancellable)
+        
         logInViewModel.currentViewPublisher
-            .assign(to: &$currentView)
+            .sink { [weak self ] view in
+                if view == .tabView {
+                    self?.tabCoordinator.profileViewModel.configureUser()
+                }
+                self?.currentView = view
+            }
+            .store(in: &anyCancellable)
+        
         tabCoordinator.currentViewPublisher
-            .assign(to: &$currentView)
+            .sink { [weak self ] view in
+                self?.tabCoordinator.profileViewModel.cleanUserData()
+                self?.currentView = view
+            }
+            .store(in: &anyCancellable)
         
         currentView = .signIn
     }

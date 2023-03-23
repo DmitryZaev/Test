@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 protocol CanUseNetworkProtocol: ObservableObject {
-    var networkManager: NetworkManagerProtocol? { get }
+    var networkService: NetworkServiceProtocol? { get }
     var cancellable: Set<AnyCancellable> { get set }
     func getData()
     func clearCancellable()

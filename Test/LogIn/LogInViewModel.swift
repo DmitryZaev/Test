@@ -15,8 +15,8 @@ protocol LogInViewModelProtocol: CanChangeViewProtocol {
     var firstNameError: Bool { get set }
     var errorMessage: String { get }
     var keychainManager: KeychainManagerProtocol? { get set }
+    var loginButtonDidPressed: Bool? { get set }
     
-    func login()
     func goBack()
 }
 
@@ -32,7 +32,15 @@ final class LogInViewModel: LogInViewModelProtocol {
     
     var keychainManager: KeychainManagerProtocol?
     
-    func login() {
+    var loginButtonDidPressed: Bool? {
+        didSet {
+            if !firstNameText.isEmpty && !passwordText.isEmpty {
+                login()
+            }
+        }
+    }
+    
+    private func login() {
         if !firstNameText.isEmpty && !passwordText.isEmpty {
             do {
                 _ = try keychainManager?.getAttributesFor(firstName: firstNameText)

@@ -11,16 +11,13 @@ import Combine
 //MARK: - Protocol
 protocol DetailedViewModelProtocol: CanChangeTabProtocol, CanUseNetworkProtocol {
     var goToCart: Bool { get set }
-    var name: String? { get set }
-    var description: String? { get set }
-    var rating: String? { get set }
-    var numberOfReviews: String? { get set }
-    var price: Double? { get set }
-    var priceString: String { get set }
-    var colors: [String]? { get set }
-    var imageUrls: [String] { get set }
+    var detailedProduct: DetailedProduct? { get set }
     var quantity: Int { get set }
+    var bigImageSize: CGSize { get set }
+    var buttonsBlockSize: CGSize { get set }
+    var buttonsBlockOffset: CGSize { get set }
     func getSummString() -> String
+    func configureSizes(viewSize: CGSize)
 }
     
 //MARK: - Implementation
@@ -32,23 +29,18 @@ final class DetailedViewModel: DetailedViewModelProtocol {
             currentTab = .cart
         }
     }
-    @Published var name: String?
-    @Published var description: String?
-    @Published var rating: String?
-    @Published var numberOfReviews: String?
-    @Published var price: Double?
-    @Published var priceString: String = ""
-    @Published var colors: [String]?
-    @Published var imageUrls: [String] = []
+    @Published var detailedProduct: DetailedProduct?
     @Published var quantity = 1
+    var bigImageSize = CGSize()
+    var buttonsBlockSize = CGSize()
+    var buttonsBlockOffset = CGSize()
     
-    var networkManager: NetworkManagerProtocol?
+    var networkService: NetworkServiceProtocol?
     
     var cancellable: Set<AnyCancellable> = []
     
     func getData() {
-        networkManager?.fetchProducts(.detailed)
-            .map{ $0 as DetailedProduct }
+        networkService?.getDetailedProduct()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -57,30 +49,25 @@ final class DetailedViewModel: DetailedViewModelProtocol {
                 case .failure(let error):
                     print("Detailed data error - \(error.localizedDescription)")
                 }
-            }, receiveValue: { [weak self] detaledProduct in
-                self?.name = detaledProduct.name
-                self?.description = detaledProduct.description
-                if let detRating = detaledProduct.rating {
-                    self?.rating = String(format: "%.1f", detRating)
-                }
-                if let detNumbOfRev = detaledProduct.numberOfReviews {
-                    self?.numberOfReviews = String(describing: detNumbOfRev)
-                }
-                if let detPrice = detaledProduct.price {
-                    self?.price = detPrice
-                    self?.priceString = String(format: "%.2f", detPrice).replacingOccurrences(of: ".", with: ",")
-                }
-                self?.price = detaledProduct.price
-                self?.colors = detaledProduct.colors
-                self?.imageUrls = detaledProduct.imageUrls ?? []
+            }, receiveValue: { [weak self] value in
+                self?.detailedProduct = value
             })
             .store(in: &cancellable)
     }
     
     func getSummString() -> String {
-        guard let price else { return "" }
+        guard let price = detailedProduct?.price else { return "" }
         let summ = price * Double(quantity)
         let string = String(format: "%.2f", summ).replacingOccurrences(of: ".", with: ",")
         return string
+    }
+    
+    func configureSizes(viewSize: CGSize) {
+        self.bigImageSize = CGSize(width: viewSize.width * 0.875,
+                                height: viewSize.height * 0.343)
+        self.buttonsBlockSize = CGSize(width: viewSize.width * 0.112,
+                                       height: viewSize.height * 0.117)
+        self.buttonsBlockOffset = CGSize(width: viewSize.width * 0.416,
+                                         height: viewSize.height * 0.079)
     }
 }

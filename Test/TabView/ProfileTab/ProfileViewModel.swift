@@ -9,12 +9,10 @@ import Foundation
 
 //MARK: - Protocol
 protocol ProfileViewModelProtocol: CanChangeTabProtocol, CanChangeViewProtocol {
-    var nameText: String { get set }
-    var photoData: Data? { get set }
-    var photoDataPublisher: Published<Data?>.Publisher { get }
-    var balance: Double { get set }
     var logoutPressed: Bool { get set }
-    var backButtonPressed: Bool { get set }
+    var backButtonPressed: Bool? { get set }
+    var user: User { get set }
+    var userPublisher: Published<User>.Publisher { get }
 }
 
 //MARK: - Implementation
@@ -23,22 +21,32 @@ final class ProfileViewModel: ProfileViewModelProtocol {
     var currentViewPublisher: Published<ViewItem?>.Publisher  { $currentView }
     @Published var currentTab: TabItem?
     var currentTabPublisher: Published<TabItem?>.Publisher { $currentTab }
-    @Published var nameText = "Satria Adhi Pradana"
-    @Published var photoData: Data?
-    var photoDataPublisher: Published<Data?>.Publisher { $photoData }
-    @Published var balance: Double = 1593.0
+    @Published var user = User(name: "",
+                               balance: 0,
+                               image: nil)
+    var userPublisher: Published<User>.Publisher { $user }
     
     var logoutPressed = false {
         didSet {
             currentView = .signIn
             currentTab = .home
-            photoData = nil
         }
     }
     
-    var backButtonPressed = false {
+    var backButtonPressed: Bool? {
         didSet {
             currentTab = .home
         }
+    }
+    
+    func configureUser() {
+        user.name = "Satria Adhi Pradana"
+        user.balance = 1593.0
+    }
+    
+    func cleanUserData() {
+        user = User(name: "",
+                    balance: 0,
+                    image: nil)
     }
 }

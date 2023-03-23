@@ -11,6 +11,7 @@ import PhotosUI
 struct ProfilePhotoView: View {
     
     @State var selectedItems = [PhotosPickerItem]()
+    @State var permission = PHPhotoLibrary.authorizationStatus(for: .readWrite)
     @Binding var imageData: Data?
     
     var body: some View {
@@ -35,26 +36,40 @@ struct ProfilePhotoView: View {
         Spacer().frame(height: 9)
         
 //MARK: - ImagePicker
-        PhotosPicker(selection: $selectedItems,
-                     maxSelectionCount: 1,
-                     matching: .images) {
+        switch permission {
+        case .denied, .notDetermined:
             Text("Change photo")
                 .font(.custom("Montserrat", size: 8))
                 .foregroundColor(Color(red: 0.502, green: 0.502, blue: 0.502))
-            
-        }.onChange(of: selectedItems) { newValue in
-            guard let item = selectedItems.first else { return }
-            item.loadTransferable(type: Data.self) { result in
-                switch result {
-                case .success(let data):
-                    guard let data else { return }
-                    DispatchQueue.main.async {
-                        self.imageData = data
+                .onTapGesture {
+                    PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                        permission = status
                     }
-                case .failure(let error):
-                    print(error.localizedDescription)
+                }
+        case .limited, .restricted, .authorized:
+            PhotosPicker(selection: $selectedItems,
+                         maxSelectionCount: 1,
+                         matching: .images) {
+                Text("Change photo")
+                    .font(.custom("Montserrat", size: 8))
+                    .foregroundColor(Color(red: 0.502, green: 0.502, blue: 0.502))
+                
+            }.onChange(of: selectedItems) { _ in
+                guard let item = selectedItems.first else { return }
+                item.loadTransferable(type: Data.self) { result in
+                    switch result {
+                    case .success(let data):
+                        guard let data else { return }
+                        DispatchQueue.main.async {
+                            self.imageData = data
+                        }
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
                 }
             }
+        @unknown default:
+            fatalError()
         }
     }
 }

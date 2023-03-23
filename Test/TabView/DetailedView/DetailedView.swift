@@ -21,32 +21,35 @@ struct DetailedView<ViewModel: DetailedViewModelProtocol>: View {
                 VStack {
 //MARK: - Big photo (TabView)
                     DetailedBigPhotoView(selected: $selected,
-                                         imageUrls: viewModel.imageUrls)
+                                         imageUrls: viewModel.detailedProduct?.imageUrls,
+                                         imageSize: viewModel.bigImageSize,
+                                         buttonsBlockSize: viewModel.buttonsBlockSize,
+                                         buttonsBlockOffset: viewModel.buttonsBlockOffset)
                     
                     Spacer().frame(height: 31)
 //MARK: - Small photos
                     DetailedSmallPhotoView(selected: $selected,
-                                           imageUrls: viewModel.imageUrls)
+                                           imageUrls: viewModel.detailedProduct?.imageUrls)
                     
                     Spacer().frame(height: 16)
                     
 //MARK: - Name, Price, Rating, Reviews, Description
-                    DetailedTextView(name: viewModel.name ?? "",
-                                     description: viewModel.description,
-                                     rating: viewModel.rating,
-                                     numberOfReviews: viewModel.numberOfReviews,
-                                     priceString: viewModel.priceString,
+                    DetailedTextView(name: viewModel.detailedProduct?.name ?? "",
+                                     description: viewModel.detailedProduct?.description,
+                                     rating: viewModel.detailedProduct?.ratingString,
+                                     numberOfReviews: viewModel.detailedProduct?.numberOfReviewsString,
+                                     priceString: viewModel.detailedProduct?.priceString ?? "",
                                      viewWidth: proxy.size.width)
                     .padding(.horizontal, 24)
 //MARK: - Colors
-                    DetailedColorsView(colors: viewModel.colors,
+                    DetailedColorsView(colors: viewModel.detailedProduct?.colors,
                                        selected: 0)
                     .padding(.leading, 24)
                     
                     Spacer()
                     
 //MARK: - +/- & AddToCart buttons
-                    if let price = viewModel.price {
+                    if let price = viewModel.detailedProduct?.price {
                         DetailedQuantityView(addToCartPressed: $viewModel.goToCart,
                                              quantity: $viewModel.quantity,
                                              price: price,
@@ -73,6 +76,7 @@ struct DetailedView<ViewModel: DetailedViewModelProtocol>: View {
             }
             .onAppear {
                 viewModel.getData()
+                viewModel.configureSizes(viewSize: proxy.size)
             }
             .onDisappear {
                 viewModel.clearCancellable()
